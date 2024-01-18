@@ -1,0 +1,115 @@
+Reading comprehension for Impcore
+=================================
+
+###  Instructions ###
+
+Edit this file, `cqs-impcore.txt`, to answer the questions below. There are
+markers indicating where you should write your answers for each question.
+
+Once you've edited the file, submit it by following the steps outlined on the
+homework spec.
+
+### Readings and Questions ###
+
+Please read pages 17--26 in *Programming Languages: Build, Prove, and Compare*.
+
+1.  What is the value of the following Impcore expression?
+
+        (if (> 3 5) 17 99)
+
+    > ... your answer here ...
+    > The answer is 99
+
+2.  Which of the following best describes the syntactic structure of
+    Impcore?
+
+    (a)   An expression can be made with any definition as one of its parts
+    (b)   A definition can be made with any expression as one of its parts
+    (c)   Both of the above
+    (d)   None of the above
+
+    > ... (a), (b), (c), or (d) ...
+    > The answer is (b), as expressions are used to define variables
+        and functions, but expressions do not contain a definition as a part
+
+3.  Does the following Impcore test pass? Please answer "yes" or "no."
+
+        (check-expect (+ 1 2 3) 6)
+
+    > ... yes or no ...
+    > No, as + is given more parameters than expected (which is 2)
+    
+
+    Assuming `x` is bound to a global variable, does the following
+    Impcore test pass? Again, please answer "yes" or "no."
+
+        (check-expect (set x 1) 1)
+
+    > ... yes or no ...
+    > Yes, as the set function returns the value the variable is set to, which 
+        in this case is 1
+
+In *Seven Lessons in Program Design*, found on the course website, read the
+Introduction and Lesson 1.
+
+4.  I show you a recursive function `f` that takes one argument, 
+    a natural number `n`.  The structure of `n`, and therefore the
+    internal structure of `f`, are based on the Peano proof system from
+    the handout.
+
+    (a) What are the different ways `n` can be formed?
+
+    > n = 0
+    > n = m + 1, where m is a natural number
+    
+    (b) In the implementation of `f`, what Impcore code should `f` use to
+        test the form of `n`?
+
+    > (f 0)
+    > (f 4) ;; I am using 4 = m + 1
+    
+    (c) For which forms of `n` do you expect `f` to make a recursive call? This
+        should match one of the forms you provided in part (a).
+
+    > The form n = m + 1, as m is also a natural number that also needs to 
+    > be processed
+
+    (d) When a recursive call is made, what value is passed as the argument?
+        Write this value as an Impcore expression.
+
+    > (f (- n 1))
+    
+Read the section titled "What is a contract?" in the Course Style Guidelines
+on the course website.
+
+5.  Suppose I write a contract for a `power` function that says, "this
+    function multiplies $x$ by itself $n$ times."  According to our
+    expectations, is this a good contract or a bad contract?
+    Please answer "good" or "bad."
+
+    > This is a bad contract, as it does not specify what x and n need to be
+    > as an input, and it does not explicitly talk about what the function 
+    > returns as a result of the function; also, it does not describe the 
+    > purpose very well as it only talks about the algorithm
+
+6.  In *Seven Lessons in Program Design*, just before the end of
+    Lesson 1, you will find a section on "Complete process examples."
+    This section suggests that the `factorial` function---but not the
+    `power` function---could be submitted without a contract.
+    
+    (a) Why would it be OK to submit the `factorial` function without
+        a contract?  For an idea, look at the "Exemplary" column in
+        the "Documentation" section of the general coding rubric.
+
+    > The function's purpose is clear from the name; it performs factorial 
+    > on the given input. In addition, the factorial function is not too 
+    > complicated, so it can get away without specifically putting limits on
+    > the input.
+
+    (b) Why doesn't the same argument apply to the `power` function?
+        For an idea, check the design lesson.
+
+    > The power function needs to specify which of the two inputs is the base 
+    > and which of the two inputs is the power
+
+You're all done!
