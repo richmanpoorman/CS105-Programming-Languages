@@ -27,6 +27,9 @@
         ;; replace next line with good check-expect or check-assert tests
         (check-expect (double-digit 9) 99)
         (check-expect (double-digit 123) 112233)
+        (check-expect (double-digit 0) 0)
+        (check-expect (double-digit 19999) 1199999999)
+        (check-expect (double-digit 10) 1100)
 
 
 
@@ -50,6 +53,10 @@
 
         (check-expect (population-count 0) 0)
         (check-expect (population-count 9) 2)
+        (check-expect (population-count 2147483647) 31)
+        (check-expect (population-count 1) 1)
+        (check-expect (population-count 735472) 10)
+        (check-expect (population-count 45967) 10)
 
 
 
@@ -77,6 +84,8 @@
         (check-expect (binary 9) 1001)
         (check-expect (binary 0) 0)
         (check-expect (binary -5) -101)
+        (check-expect (binary 15) 1111)
+        (check-expect (binary -16) -10000)
 
 
 
@@ -93,7 +102,6 @@
 ;;   (sigma m m) == m
 ;;   (sigma m n) == (+ n (sigma m (- n 1))), where n > m
 
-;; TODO :: Look at negative numbers
 (define sigma (m n)
     (if (= m n)
         m 
@@ -103,6 +111,9 @@
         (check-expect (sigma 0 0) 0)
         (check-expect (sigma 0 10) 55)
         (check-expect (sigma -10 10) 0)
+        (check-expect (sigma -10 0) -55)
+        (check-expect (sigma -10 -10) -10)
+
 
 
 
@@ -113,13 +124,12 @@
 ;; (no-factor-of? m n) returns 0 if any value from [m, n - 1] is a factor of n,
 ;; and 1 if m is equal to n or there are no factors in the range [m, n - 1], 
 ;; where both m and n are natural numbers greater or equal to 2 with n 
-;; being greater or equal to n
+;; being greater or equal to m (aka m <= n)
 
 ;; laws:
 ;;  (no-factor-of? n n) == 1
-;;  (no-factor-of? m n) == (if (= (mod n m) 0)
-;;                          0
-;;                          (no-factor-of? (+ m 1) n)), where m < n
+;;  (no-factor-of? m n) == 0, where n % m = 0
+;;  (no-factor-of? m n) == (no-factor-of? (+ m 1) n)), and n % m != 0
 (define no-factor-of? (m n)
     (if (= n m)
         1
@@ -142,7 +152,7 @@
 ;; laws:
 ;;   (prime? n) == 0, where n < 2
 ;;   (prime? n) == 1, where n = 2
-;;   (prime? n) == (factor-of? 2 n), where n > 2
+;;   (prime? n) == (no-factor-of? 2 n), where n > 2
 
 (define prime? (n)
     (if (< n 2)
@@ -170,7 +180,7 @@
 ;; laws:
 ;;  (nth-prime-after 1 m) == m, where m is prime
 ;;  (nth-prime-after n m) == (nth-prime-after (- n 1) (+ m 1)), where 
-;;      m is prime and n > 1
+;;      m is prime and n > 1 (aka n >= 2)
 ;;  (nth-prime-after n m) == (nth-prime-after n (+ m 1)), where m is not prime
 
 
@@ -184,6 +194,8 @@
         (check-expect (nth-prime-after 1 2) 2)
         (check-expect (nth-prime-after 2 19) 23)
         (check-expect (nth-prime-after 1 4) 5)
+        (check-expect (nth-prime-after 1 1) 2)
+        (check-expect (nth-prime-after 100 3) 547)
 
 ;; (nthprime n) Returns the nth prime number in the sequence of prime numbers, 
 ;; given that n is a positive  integer (aka n > 0) and 
