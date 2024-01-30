@@ -1,0 +1,19 @@
+
+
+;; (valueWithUndefined) The function returns value of the unbound variable y;
+;; in pure impcore, the function causes a runtime error, as y is unbound.
+;; In awk-like, y is automatically set as a global variable, so y is first 
+;; defined in this function to the value 0. This means that the function will
+;; return what the global variable y is updated to be. In icon-like, y is 
+;; automatically set as a local variable with value 0, so the function will
+;; always return 0
+(define valueWithUndefined () y) 
+
+
+(begin 
+    (set y 1)             ;; Creates/redefines the global variable y to 1
+    (valueWithUndefined)) ;; Returns the value of y in the local/global scope
+
+;; Setting the global variable to y in icon doesn't cause the function
+;; to use the global version of y, as it has a local variable (which 
+;; overrides the global variable) for y in the function (which is set to 0)
