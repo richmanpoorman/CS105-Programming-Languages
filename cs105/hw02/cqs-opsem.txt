@@ -28,6 +28,7 @@ semantics of expressions). These questions are multiple-choice.
     (f) *only* the values of global variables.
 
     > ... (a), (b), (c), (d), (e), or (f) ...
+    > (f)
 
  2. $\phi$ (ϕ) is an environment that maps names to
 
@@ -38,7 +39,7 @@ semantics of expressions). These questions are multiple-choice.
     (e) *only* primitive functions.
     (f) *only* the values of global variables.
 
-    > 
+    > (c)
 
  3. $\rho$ (ρ) is an environment that maps names to
 
@@ -49,7 +50,7 @@ semantics of expressions). These questions are multiple-choice.
     (e) *only* primitive functions.
     (f) *only* the values of global variables.
 
-    > 
+    > (b)
 
  4. In the operational semantics, what kind of a thing does the
     metavariable $e$ stand for?
@@ -60,7 +61,7 @@ semantics of expressions). These questions are multiple-choice.
     (d) an expression
     (e) a value
 
-    > 
+    > (d)
 
  5. In the operational semantics, what kind of a thing does the
     metavariable $v$ stand for?
@@ -71,7 +72,7 @@ semantics of expressions). These questions are multiple-choice.
     (d) an expression
     (e) a value
 
-    > 
+    > (e)
 
  6. In the operational semantics, what kind of a thing does the
     phrase "ρ{x ↦ 7}(x)" ($\rho\{x \mapsto 7\}(x)$) stand for?
@@ -82,7 +83,7 @@ semantics of expressions). These questions are multiple-choice.
     (d) an expression
     (e) a value
 
-    > 
+    > (a)
 
  7. In the operational semantics, what kind of a thing does the
     phrase "ρ{x ↦ 7}{x ↦ 8}" ($\rho\{x \mapsto 7\}\{x \mapsto 8\}$)
@@ -94,19 +95,19 @@ semantics of expressions). These questions are multiple-choice.
     (d) an expression
     (e) a value
 
-    > 
+    > (a)
 
 
  8. Between pages 28--37, how many distinct, named rules are written with the IF
     syntactic form in the conclusion (don't use the rules written on page 78 to
     answer this questions)? 
 
-    > 
+    > There are 19 rules
 
  9. Between pages 28--37, how many distinct, named rules are written with the
     APPLY syntactic form in the conclusion (don't use page 78)?
 
-    > 
+    > There are 5 rules
 
 Now let's understand a subtle point about rules. Study the FormalVar
 and FormalAssign rules starting on page 32.  In FormalVar, the initial
@@ -122,7 +123,7 @@ Answer these questions:
     (b) Evaluating $x$ must change the value of any formal parameter.
     (c) Evaluating $x$ doesn't change the value of any formal parameter.
 
-    > 
+    > (c)
       
 11. In rule FormalAssign, there is an intermediate state with $\rho'$ (ρ')
     (rho-prime) because
@@ -131,7 +132,7 @@ Answer these questions:
     (b) Evaluating $e$ must change the value of any formal parameter.
     (c) Evaluating $e$ doesn't change the value of any formal parameter.
 
-    > 
+    > (a)
 
     
 For this last question, please read from the bottom of page 55 to page 59 in
@@ -152,4 +153,4 @@ in which ρ(n) = 8" should say "...and an environment ρ in which ρ(n) = 7."
     (c) The general semantic rules used in the derivation never affect the
         formal parameter environment $\rho$ (ρ).
 
-    > 
+    > (c)
