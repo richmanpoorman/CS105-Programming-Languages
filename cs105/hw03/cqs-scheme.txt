@@ -140,11 +140,11 @@ Build, Prove, and Compare*.
 
     How many laws are used in this proof in the base case? What are their names?
     
-    > 2; append-cons and append-empty
+    > 2; append-empty and length-empty
     
     How many laws are used in the inductive case? What are their names?
     
-    > 3; append-cons, length-cons, and associativity of + 
+    > 2; append-cons and length-cons
     
     
  8. Read the beginning of section 2.6 from pages 117 to the bottom of 118 (stop

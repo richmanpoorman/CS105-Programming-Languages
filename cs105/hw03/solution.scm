@@ -188,8 +188,7 @@
 ;; where x is from xs and y is the corresponding value from ys
 
 ;; laws:
-;;   (zip '() ys) == '()
-;;   (zip xs '()) == '()
+;;   (zip '() '()) == '()
 ;;   (zip (cons z zs) (cons w ws)) == 
 ;;      (cons (cons x (cons y '()) ) (zip zs ws))
 ;;   ...
@@ -197,16 +196,18 @@
 ;; Otherwise, make a list of x and y, then add them to the list
 
 (define zip (xs ys)
-    (if (|| (null? xs) (null? ys)) 
+    (if (&& (null? xs) (null? ys)) 
         '()
         (cons 
-            (cons (car xs) (cons (car ys) '()))
+            (list2 (car xs) (car ys))
             (zip (cdr xs) (cdr ys) )))) ;; replace this line with good code
 
         ;; replace next line with good check-expect or check-assert tests
         (check-expect (zip '() '()) '())
         (check-expect (zip '(a) '(1)) '((a 1)))
         (check-expect (zip '(1 2 3) '(a b c)) '((1 a) (2 b) (3 c)))
+        (check-expect (zip '(1 (2 3)) '((a b c) (d))) 
+            '((1 (a b c)) ((2 3) (d))))
 
 ;; (unzip ps) Given a list of 2-length lists (pairs) ps, the function returns
 ;; a pair (list of length 2) of lists containing the separate elements; in 
@@ -244,6 +245,8 @@
         (check-expect (unzip '()) '(() ()))
         (check-expect (unzip '((a b))) '((a) (b)))
         (check-expect (unzip '((1 2) (3 4) (5 6))) '((1 3 5) (2 4 6)))
+        (check-expect (unzip '((a (b c d)) (() a2) (() ()))) 
+            '((a () ()) ((b c d) a2 ())))
 
 
 
@@ -281,4 +284,6 @@
         (check-expect (arg-max car '((1))) '(1))
 (define square-negate (x) (- 0 (* x x)))
         (check-expect (arg-max square-negate '(1 -22 0 101 -5)) 0)
+        (check-expect (arg-max (lambda (x) (- 0 x))
+                        '(-100 0 100)) -100)
 
