@@ -217,6 +217,5 @@ course website.
     into `>`, among other tricks.  Write as many algebraic laws as are needed to
     specify `flip`:
 
-    > (flip f)     == result
-    > (result x y) == (f y x)
+    > ((flip f) x y) == (f y x)
     
