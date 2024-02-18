@@ -23,6 +23,7 @@
         (check-expect ((flip <) 1 2) (> 1 2))
         (check-expect ((flip <) 2 1) (> 2 1))
         (check-expect ((flip <) 1 1) (> 1 1))
+        (check-expect ((flip (flip <)) 1 1) (< 1 1))
 
 
 ;; 
