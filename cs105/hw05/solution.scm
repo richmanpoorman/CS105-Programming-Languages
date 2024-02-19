@@ -28,8 +28,8 @@
                         (lambda (x) (list-of? symbol? x))
                         '((x y) () (x y z))))
         (check-assert (not (list-of? 
-                        (lambda (x) (list-of? symbol? x))
-                        '((x y) () (x y z) (12)))))
+                                (lambda (x) (list-of? symbol? x))
+                                '((x y) () (x y z) (12)))))
         (check-assert (not (list-of? symbol? '(a b () c d))))
         (check-assert (not (list-of? boolean? (cons #t #f))))
         (check-assert (not (list-of? atom? 'COMP)))
@@ -67,7 +67,7 @@
         (check-assert (formula? (make-or '(x y) )))
         (check-assert (formula? (make-and '(x y) )))
         (check-assert (formula? 
-                        (make-not (make-and (list2 (make-or '(x)) 'x)))))                
+                        (make-not (make-and (list2 (make-or '(x)) 'x)))))
         (check-assert (not (formula? formula?)))
         (check-assert (not (formula? '())))
         (check-assert (not (formula? (make-not '()))))
@@ -215,8 +215,10 @@
                                 (solve-all (or-args f) #f cur fail succeed))
                             (if (and? f) 
                                 (if bool 
-                                    (solve-all (and-args f) #t cur fail succeed)
-                                    (solve-any (and-args f) #f cur fail succeed)) 
+                                    (solve-all (and-args f) #t 
+                                        cur fail succeed)
+                                    (solve-any (and-args f) #f 
+                                        cur fail succeed)) 
                                 ;; If not given proper boolean formula
                                 (fail) )))))] 
         
@@ -269,7 +271,7 @@
                 (if (null? fs) 
                     (fail) 
                     (solve-formula (car fs) bool cur 
-                        (lambda () (solve-any fs bool cur fail succeed))
+                        (lambda () (solve-any (cdr fs) bool cur fail succeed))
                         succeed) ))]
 
         ;; (solve-symbol x bool cur fail succeed) Given a symbol which 
@@ -293,24 +295,110 @@
         ;;          (fail), where x is (not bool) in cur
          [solve-symbol 
             (lambda (x bool cur fail succeed) 
-                (let ([pair (find x cur)])
-                    (if (null? pair) 
+                (let ([value (find x cur)])
+                    (if (null? value) 
                         (succeed (bind x bool cur) fail) 
-                        (if (equal? bool (alist-pair-attribute pair))
+                        (if (equal? bool value)
                             (succeed cur fail) 
                             (fail) ))) )])
             
             ;; SOLVE THE FORMULA 
             (solve-formula f #t '() fail succ))) 
 
+;; MY TESTS ;; 
+        (check-expect 
+            (solve-sat 
+                (make-and '())
+                (lambda () 'fail)
+                (lambda (env resume) 'success))
+            'success )
+        (check-expect 
+            (solve-sat 
+                (make-or '())
+                (lambda () 'fail)
+                (lambda (env resume) 'success))
+            'fail )
+        (check-expect 
+            (solve-sat 
+                'x
+                (lambda () 'fail)
+                (lambda (env resume) 'success))
+            'success )
+        (check-expect 
+            (solve-sat 
+                (make-or '(x))
+                (lambda () 'fail)
+                (lambda (env resume) 'success)) 
+            'success)
+        (check-expect 
+            (solve-sat 
+                (make-or (list2 (make-not 'x) 'x)) 
+                (lambda () 'fail)
+                (lambda (env resume) 'success))
+            'success )
+        (check-expect
+            (solve-sat 
+                (make-not (make-not 'x)) 
+                (lambda () 'fail)
+                (lambda (env resume) 'success))
+            'success )
+        (check-expect 
+            (solve-sat 
+                (make-and (list2 (make-not 'x) 'y)) 
+                (lambda () 'fail)
+                (lambda (env resume) 'success))
+            'success )
+        (check-expect 
+            (solve-sat 
+                (make-and (list1 (make-not 'x)))
+                (lambda () 'fail)
+                (lambda (env resume) 'success))
+            'success )
+        (check-expect 
+            (solve-sat 
+                (make-and (list2 
+                            (make-or (list2 (make-not 'x) 'x)) 
+                            (make-not 'x)))
+                (lambda () 'fail)
+                (lambda (env resume) 'success))
+            'success )
+        (check-expect 
+            (solve-sat 
+                (make-or (list2 
+                            (make-and (list2 'x (make-not 'x) )) 
+                            (make-and (list2 'y (make-not 'y) )) ))
+                (lambda () 'fail)
+                (lambda (env resume) 'success))
+            'fail )
+        (check-expect 
+            (solve-sat 
+                (make-and (list3 'x 'y 
+                            (make-or (list2 (make-not 'x) (make-not 'y)))))
+                (lambda () 'fail)
+                (lambda (env resume) 'success))
+            'fail)
+        (check-expect 
+            (solve-sat 
+                (make-and (list2 'x (make-not 'x) )) 
+                (lambda () 'fail)
+                (lambda (env resume) 'success))
+            'fail )
+        (check-expect 
+            (solve-sat 
+                (make-and (list2 (make-not 'x) 'x)) 
+                (lambda () 'fail)
+                (lambda (env resume) 'success))
+            'fail )
+
 ;;; TESTS ;;; 
         (check-assert (function? solve-sat))    ; correct name
         (check-error (solve-sat))                ; not 0 arguments
         (check-error (solve-sat 'x))             ; not 1 argument
         (check-error (solve-sat 'x (lambda () 'fail)))   ; not 2 args
+        
         (check-error
-            (solve-sat 'x (lambda () 'fail) (lambda (c r) 'succeed) 'z)) ; not 4 args
-
+            (solve-sat 'x (lambda () 'fail) (lambda (c r) 'succeed) 'z)) 
+                ; not 4 args
         (check-error (solve-sat 'x (lambda () 'fail) (lambda () 'succeed)))
             ; success continuation expects 2 arguments, not 0
         (check-error (solve-sat 'x (lambda () 'fail) (lambda (_) 'succeed)))
@@ -350,5 +438,5 @@
             (solve-sat (make-and (list2 'x (make-not 'x)))
                         (lambda () 'fail)
                         (lambda (cur resume) 'succeed))
-       'fail)
+            'fail)
 
