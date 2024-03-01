@@ -105,11 +105,11 @@
         (if (not? f) 
             (not (eval-formula (not-arg f) env))
             (if (or? f) 
-                (not (list-of? 
-                        (lambda (x) (not (eval-formula x env)))
-                        (or-args f)))
+                (exists? 
+                    (lambda (x) (eval-formula x env))
+                    (or-args f))
                 (if (and? f) 
-                    (list-of? 
+                    (all? 
                         (lambda (x) (eval-formula x env))
                         (and-args f))
                     #f )))))
