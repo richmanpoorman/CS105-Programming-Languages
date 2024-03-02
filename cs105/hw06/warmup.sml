@@ -8,6 +8,7 @@
 
 (*****************************************************************************
     (mynull ls) Given a list ls, returns true if ls is empty, false otherwise 
+        a' list -> bool 
 *****************************************************************************)
 fun mynull [] = true 
   | mynull _  = false
@@ -27,6 +28,7 @@ val () =
 
 (*****************************************************************************
     (reverse ls) Given a list ls, returns the reversed version of the list 
+        a' list -> a'list
 *****************************************************************************)
 fun reverse ls = foldl (fn (x, acc) => x :: acc) [] ls
 
@@ -52,6 +54,7 @@ val () =
 
 (*****************************************************************************
     (minlist ls) Given a non-empty list of integers ls, returns the min value 
+        int list -> int
 *****************************************************************************)
 fun minlist []            = raise Match 
   | minlist (first :: ls) = foldl Int.min first ls
@@ -87,6 +90,7 @@ exception Mismatch
     (zip (xs, ys)) Given a tuple of lists (xs, ys), where xs and ys have the
     same length, returns a list of tuples with the corresponding values in xs 
     and ys put together in a tuple 
+        a' list * b' list -> '(a * 'b) list
 *****************************************************************************)
 fun zip ([]       , []       ) = [] 
   | zip (_        , []       ) = raise Mismatch 
@@ -120,11 +124,12 @@ val () =
     value acc, and a tuple of equal-sized lists (xs, ys), the function 
     returns the f applied to every value of (xs, ys) accumulating 
     from right to left 
+        ('a * 'b * 'c -> 'c) -> 'c -> 'a list * 'b list -> 'c
 *****************************************************************************)
-fun pairfoldrEq f acc ([], []) = acc
-  | pairfoldrEq f acc ([], _) = raise Mismatch
-  | pairfoldrEq f acc (_ ,[]) = raise Mismatch 
-  | pairfoldrEq f acc ((x :: xs), (y :: ys)) =  
+fun pairfoldrEq f acc ([]       , []       ) = acc
+  | pairfoldrEq f acc ([]       , _        ) = raise Mismatch
+  | pairfoldrEq f acc (_        , []       ) = raise Mismatch 
+  | pairfoldrEq f acc ((x :: xs), (y :: ys)) = 
         f (x, y, pairfoldrEq f acc (xs, ys)) 
 
 (* Unit Test *)
@@ -152,15 +157,15 @@ val () =
 val () = 
     Unit.checkExpectWith Unit.intString "fold ordering matters" 
     (fn () => pairfoldrEq orderMatters 0 ([1, 2, 3, 4], [1, 2, 3, 4]))
-    ~8
+    ~10
 
 (*****************************************************************************
     (ziptoo (xs, ys)) Given a tuple of lists (xs, ys), where xs and ys have the
     same length, returns a list of tuples with the corresponding values in xs 
     and ys put together in a tuple, using pairfoldrEq
+        'a list * 'b list -> ('a * 'b) list
 *****************************************************************************)
-fun ziptoo (xs, ys) = 
-    pairfoldrEq (fn (x, y, acc) => (x, y) :: acc) [] (xs, ys) 
+fun ziptoo (xs, ys) = pairfoldrEq (fn (x, y, acc) => (x, y) :: acc) [] (xs, ys)
 
 (* Unit Test *)
 val () =
@@ -177,3 +182,109 @@ val () =
 val () = 
     Unit.checkExnWith list_pair_toString "right smaller" 
     (fn () => ziptoo ([1, 2], [1, 2, 3, 4]))
+
+
+(*** Problem 5 ***)
+
+(*****************************************************************************
+    (concat xs) Given a list of lists, returns a list of all of the lists 
+    concatenated together into one list
+        'a list list -> 'a list
+*****************************************************************************)
+fun concat []         = [] 
+  | concat (ls :: xs) = ls @ concat xs
+
+(* Unit Test *)
+val () = 
+    Unit.checkExpectWith int_list_toString "initially empty" 
+    (fn () => concat []) 
+    [] 
+val () = 
+    Unit.checkExpectWith int_list_toString "filled with empty" 
+    (fn () => concat [[], [], [], [], [], [], [], [], [], []])
+    [] 
+val () = 
+    Unit.checkExpectWith int_list_toString "Multiple lists"
+    (fn () => concat [[1], [2, 3], [4, 5, 6], [7, 8, 9, 10]])
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+val () = 
+    Unit.checkExpectWith int_list_toString "Lists with some empty" 
+    (fn () => concat [[], [1], [], [], [2, 3], [4, 5, 6], [], []])
+    [1, 2, 3, 4, 5, 6]
+
+(*** Problem 6 ***)
+datatype ordsx 
+  = BOOL of bool
+  | NUM  of int
+  | SYM  of string
+  | SXS  of ordsx list
+fun sxString (SYM s)   = s
+  | sxString (NUM n)   = Unit.intString n
+  | sxString (BOOL b)  = if b then "true" else "false"
+  | sxString (SXS sxs) = "(" ^ String.concatWith " " (map sxString sxs) ^ ")"
+
+(*****************************************************************************
+    (numbersSx ls) Given a list of integers ls, returns the ordinary expression
+    representation of the integer list
+        int list -> ordsx
+*****************************************************************************)
+fun numbersSx [] = SXS [] 
+  | numbersSx ls = SXS (foldr (fn (n, acc) => NUM n :: acc) [] ls)
+
+(* Unit Test *)
+val () = 
+    Unit.checkExpectWith sxString "empty list" 
+    (fn () => numbersSx []) 
+    (SXS [])
+val () = 
+    Unit.checkExpectWith sxString "single element" 
+    (fn () => numbersSx [1]) 
+    (SXS [NUM 1])
+val () = 
+    Unit.checkExpectWith sxString "multiple elements" 
+    (fn () => numbersSx [1, 2, 3, 4, 5]) 
+    (SXS [NUM 1, NUM 2, NUM 3, NUM 4, NUM 5])
+
+(*****************************************************************************
+    (flattenSyms exp) Given an ordinary expression exp, returns a list of 
+    the symbols from the expression 
+        ordsx -> string list
+*****************************************************************************)
+fun flattenSyms (SYM x)         = [x]
+  | flattenSyms (SXS (x :: xs)) = flattenSyms x @ flattenSyms (SXS xs)
+  | flattenSyms _               = [] 
+
+(* Unit Test *)
+val string_list_toString = Unit.listString Unit.stringString
+val () = 
+    Unit.checkExpectWith string_list_toString "Single symbol"
+    (fn () => flattenSyms (SYM "a"))
+    ["a"]
+val () = 
+    Unit.checkExpectWith string_list_toString "Empty List" 
+    (fn () => flattenSyms (SXS []))
+    [] 
+val () = 
+    Unit.checkExpectWith string_list_toString "Single Number" 
+    (fn () => flattenSyms (NUM 1))
+    [] 
+val () = 
+    Unit.checkExpectWith string_list_toString "Single Boolean" 
+    (fn () => flattenSyms (BOOL true))
+    [] 
+val () =
+    Unit.checkExpectWith string_list_toString "List of multiple symbols"
+    (fn () => flattenSyms (SXS [SYM "A", SYM "B", SYM "C"]))
+    ["A", "B", "C"]
+val () =
+    Unit.checkExpectWith string_list_toString "List with duplicate symbols"
+    (fn () => flattenSyms (SXS [SYM "A", SYM "A", SYM "B", SYM "C", SYM "B"]))
+    ["A", "A", "B", "C", "B"]
+val () =
+    Unit.checkExpectWith string_list_toString "List of mixed symbols"
+    (fn () => flattenSyms (SXS [SYM "A", NUM 1, BOOL true, SYM "B", SYM "C"]))
+    ["A", "B", "C"]
+val () =
+    Unit.checkExpectWith string_list_toString "Nested List"
+    (fn () => flattenSyms (SXS [SXS [SYM "B", NUM 1, SXS []], SYM "A"]))
+    ["B", "A"]
