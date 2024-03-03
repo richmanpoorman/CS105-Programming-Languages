@@ -1624,6 +1624,16 @@ local
     val noVal = WHILEX (boolLiteral, nilLiteral) 
     val guard = WHILEX (nested, setZinYinX)
     val clause = WHILEX (empty, varX)
+        (* Let Tests *)
+    val letInBs = LETX (LET, [("x", varX)], nilLiteral)
+    val letEmptyBs = LETX (LET, [], varX)
+    val letInBody = LETX (LET, [("x", varX), ("y", setYinX)], xyz)
+    val letrecInBs = LETX (LETREC, [("x", varX)], nilLiteral)
+    val letrecEmptyBs = LETX (LETREC, [], varX)
+    val letrecInBody = LETX (LETREC, [("x", varX), ("y", setYinX)], xyz)
+    val letstarInBs = LETX (LETSTAR, [("x", varX)], nilLiteral)
+    val letstarEmptyBs = LETX (LETSTAR, [], varX)
+    val letstarInBody = LETX (LETSTAR, [("x", varX), ("y", setYinX)], xyz)
  in
  val () =
      Unit.checkAssert "freeIn (set literal) true"
@@ -1735,6 +1745,52 @@ val () =
     Unit.checkAssert "freeIn begin empty"
     (fn () => not (freeIn empty "x"))
 (* While Tests *)
+val () = 
+    Unit.checkAssert "freeIn while none"
+    (fn () => not (freeIn noVal "x"))
+val () =
+    Unit.checkAssert "freeIn while in guard"
+    (fn () => freeIn guard "x")
+val () =
+    Unit.checkAssert "freeIn while in clause"
+    (fn () => freeIn clause "x")
+val () =
+    Unit.checkAssert "freeIn while not in clause"
+    (fn () => not (freeIn clause "z"))
+val () =
+    Unit.checkAssert "freeIn while nested"
+    (fn () => freeIn guard "z")
+(* Let Tests *)
+val () = 
+    Unit.checkAssert "freeIn let in bs"
+    (fn () => freeIn letInBody "x")
+val () = 
+    Unit.checkAssert "freeIn let not in bs"
+    (fn () => not (freeIn letInBody "y"))
+val () = 
+    Unit.checkAssert "freeIn let empty bs"
+    (fn () => freeIn letEmptyBs "x") 
+val () =
+    Unit.checkAssert "freeIn let in body"
+    (fn () => freeIn letInBody "z")
+val () =
+    Unit.checkAssert "freeIn let in body with member of bs"
+    (fn () => freeIn letInBody "x")
+val () = 
+    Unit.checkAssert "freeIn letrec in bs"
+    (fn () => freeIn letrecInBody "x")
+val () = 
+    Unit.checkAssert "freeIn letrec not in bs"
+    (fn () => not (freeIn letrecInBody "y"))
+val () = 
+    Unit.checkAssert "freeIn letrec empty bs"
+    (fn () => freeIn letrecEmptyBs "x") 
+val () =
+    Unit.checkAssert "freeIn letrec in body"
+    (fn () => freeIn letrecInBody "z")
+val () =
+    Unit.checkAssert "freeIn letrec in body"
+    (fn () => not (freeIn letrecInBody "x"))
  end
 
 (* evaluation, testing, and the read-eval-print loop for \uscheme S380b *)
