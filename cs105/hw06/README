@@ -1,1 +1,18 @@
-Time: 2hr
+Name       : Matthew Wong 
+Assignment : Homework 6: Programming with ML
+Time       : 12 hr
+Help       : Vivian (TA)
+
+Time Improvement:
+env BPCOPTIONS=nothrottle time run-exponential-subsets 21 ./mlscheme
+    5.19user 0.00system 0:05.22elapsed 99%CPU
+
+env BPCOPTIONS=nothrottle time run-exponential-subsets 21 ./mlscheme-improved
+    1.29user 0.00system 0:01.31elapsed 99%CPU
+
+env BPCOPTIONS=nothrottle time run-exponential-subsets 21 /comp/105/bin/uscheme
+    17.05user 0.92system 0:18.04elapsed 99%CPU
+
+The MLScheme-Improved took 1.29 seconds, while the original MLScheme took 5.19
+    seconds; our version is about 4.02325581395 ~ 4 times faster than the 
+    original interpreter

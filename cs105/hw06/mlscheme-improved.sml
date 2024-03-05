@@ -1570,20 +1570,18 @@ val _ = op stringsxdefs : string * string list               -> xdef stream
 *****************************************************************)
 fun freeIn expr var = 
     let 
-        fun hasSatisfy p ls = foldl (fn (x, acc) => acc orelse p x) false ls
         fun free (LITERAL v) = false
           | free (VAR x) = x = var
           | free (SET (x, e)) = x = var orelse free e
-          | free (APPLY (f, args)) = free f orelse hasSatisfy free args
+          | free (APPLY (f, args)) = free f orelse List.exists free args
           | free (LAMBDA (xs, e)) = not (member var xs) andalso free e
           | free (IFX (e1, e2, e3)) = free e1 orelse free e2 orelse free e3
           | free (WHILEX (guard, body)) = free guard orelse free body
-          | free (BEGIN es) = hasSatisfy free es
-          | free (LETX (LET, bs, body)) = hasSatisfy (free o snd) bs 
+          | free (BEGIN es) = List.exists free es
+          | free (LETX (LET, bs, body)) = List.exists (free o snd) bs 
                 orelse (not (member var (map fst bs)) andalso free body)
-          | free (LETX (LETREC, bs, body)) = 
-                not (member var (map fst bs)) 
-                andalso (hasSatisfy (free o snd) bs orelse free body)
+          | free (LETX (LETREC, bs, body)) = not (member var (map fst bs)) 
+                andalso (List.exists (free o snd) bs orelse free body)
           | free (LETX (LETSTAR, [], body)) = free body 
           | free (LETX (LETSTAR, (b :: bs), body)) = 
                 free (LETX (LET, [b], LETX (LETSTAR, bs, body)))
@@ -1591,207 +1589,237 @@ fun freeIn expr var =
     end
 
 (* Unit Tests *)
-local
-   val set_x1 = SET ("x", LITERAL (NUM 1))
-   (* More local definitions can go here for unit testing... *)
-        (* Literal Tests *)
-    val nilLiteral  = LITERAL NIL
-    val numLiteral  = LITERAL (NUM 99) 
-    val boolLiteral = LITERAL (BOOLV true)
-    val symLiteral  = LITERAL (SYM "X")
-    val pairLiteral = LITERAL (PAIR (BOOLV false, NUM 0))
-        (* Var tests *)
-    val varX = VAR "x"
-        (* Set tests *)
-    val setX       = SET ("x", nilLiteral) 
-    val setYinX    = SET ("x", SET ("y", numLiteral))
-    val setXinX    = SET ("x", SET ("x", boolLiteral))
-    val setZinYinX = SET ("x", SET ("y", SET ("z", pairLiteral)))
-        (* Lambda Test *)
-    val partB = LAMBDA (["y"], APPLY (VAR "equal?", [VAR "x", VAR "y"]))
-    val partA = LAMBDA (["x"], partB)
-        (* If Tests *)
-    val noVars = IFX (nilLiteral, numLiteral, boolLiteral)
-    val onePath = IFX (boolLiteral, numLiteral, varX) 
-    val inE1 = IFX (varX, numLiteral, pairLiteral) 
-    val inE2 = IFX (setX, setYinX, setXinX)
-    val inE3 = IFX (setX, partB, setZinYinX)
-        (* Begin Tests *)
-    val xyz = BEGIN [varX, setYinX, setZinYinX]
-    val nested = BEGIN [partA, partB]
-    val empty = BEGIN []
-        (* While Tests *)
-    val noVal = WHILEX (boolLiteral, nilLiteral) 
-    val guard = WHILEX (nested, setZinYinX)
-    val clause = WHILEX (empty, varX)
-        (* Let Tests *)
-    val letInBs = LETX (LET, [("x", varX)], nilLiteral)
-    val letEmptyBs = LETX (LET, [], varX)
-    val letInBody = LETX (LET, [("x", varX), ("y", setYinX)], xyz)
-    val letrecInBs = LETX (LETREC, [("x", varX)], nilLiteral)
-    val letrecEmptyBs = LETX (LETREC, [], varX)
-    val letrecInBody = LETX (LETREC, [("x", varX), ("y", setYinX)], xyz)
-    val letstarInBs = LETX (LETSTAR, [("x", varX)], nilLiteral)
-    val letstarEmptyBs = LETX (LETSTAR, [], varX)
-    val letstarInBody = LETX (LETSTAR, [("x", varX), ("y", setYinX)], xyz)
- in
- val () =
-     Unit.checkAssert "freeIn (set literal) true"
-     (fn () => freeIn set_x1 "x")
- (* More unit tests go here ... *)
-(* Literal tests *)
-val () =
-    Unit.checkAssert "freeIn Literal Nil"
-    (fn () => not (freeIn nilLiteral "X"))
-val () =
-    Unit.checkAssert "freeIn Literal Num"
-    (fn () => not (freeIn numLiteral "X"))
-val () =
-    Unit.checkAssert "freeIn Literal Bool"
-    (fn () => not (freeIn boolLiteral "X"))
-val () =
-    Unit.checkAssert "freeIn Literal Sym"
-    (fn () => not (freeIn symLiteral "X"))
-val () =
-    Unit.checkAssert "freeIn Literal Pair"
-    (fn () => not (freeIn pairLiteral "X"))
-(* Var tests *)
-val () = 
-    Unit.checkAssert "freeIn free var"
-    (fn () => freeIn varX "x") 
-val () = 
-    Unit.checkAssert "freeIn not free var" 
-    (fn () => not (freeIn varX "y"))
-(* Set tests *)
-val () = 
-    Unit.checkAssert "freeIn set x" 
-    (fn () => freeIn setX "x")
-val () =
-    Unit.checkAssert "freeIn not set y" 
-    (fn () => not (freeIn setX "y"))
-val () = 
-    Unit.checkAssert "freeIn set in first nested expression"
-    (fn () => freeIn setYinX "x")
-val () =
-    Unit.checkAssert "freeIn set in nested expression"
-    (fn () => freeIn setYinX "y") 
-val () =
-    Unit.checkAssert "freeIn not set in nested expression" 
-    (fn () => not (freeIn setYinX "z"))
-val () = 
-    Unit.checkAssert "freeIn set in double nested expression" 
-    (fn () => freeIn setZinYinX "z")
-(* Lambda Tests *)
-val () = 
-    Unit.checkAssert "freeIn part A unfree variable x"
-    (fn () => not (freeIn partA "x"))
-val () = 
-    Unit.checkAssert "freeIn part A unfree variable y"
-    (fn () => not (freeIn partA "y"))
-val () = 
-    Unit.checkAssert "freeIn part A free variable equal?"
-    (fn () => freeIn partA "equal?")
-val () = 
-    Unit.checkAssert "freeIn part B free variable x"
-    (fn () => freeIn partB "x")
-val () =
-    Unit.checkAssert "freeIn part B unfree variable y"
-    (fn () => not (freeIn partB "y"))
-val () =
-    Unit.checkAssert "freeIn part B free variable equal?"
-    (fn () => freeIn partB "equal?")
-(* If Tests *) 
-val () = 
-    Unit.checkAssert "freeIn if no vars" 
-    (fn () => not (freeIn noVars "x"))
-val () =
-    Unit.checkAssert "freeIn if one path var" 
-    (fn () => freeIn onePath "x")
-val () =
-    Unit.checkAssert "freeIn if one path no var" 
-    (fn () => not (freeIn onePath "y"))
-val () =
-    Unit.checkAssert "freeIn if in e1"
-    (fn () => freeIn inE1 "x")
-val () =
-    Unit.checkAssert "freeIn if in e1 not there"
-    (fn () => not (freeIn inE1 "y"))
-val () =
-    Unit.checkAssert "freeIn if in e2"
-    (fn () => freeIn inE2 "y")
-val () =
-    Unit.checkAssert "freeIn if in e3"
-    (fn () => freeIn inE3 "z")
-(* Begin Tests *)
-val () = 
-    Unit.checkAssert "freeIn begin x"
-    (fn () => freeIn xyz "x")
-val () = 
-    Unit.checkAssert "freeIn begin y"
-    (fn () => freeIn xyz "y")
-val () = 
-    Unit.checkAssert "freeIn begin z"
-    (fn () => freeIn xyz "z")
-val () = 
-    Unit.checkAssert "freeIn begin not w"
-    (fn () => not (freeIn xyz "w"))
-val () = 
-    Unit.checkAssert "freeIn begin lambda x"
-    (fn () => freeIn nested "x")
-val () = 
-    Unit.checkAssert "freeIn begin lambda y"
-    (fn () => not (freeIn nested "y"))
-val () = 
-    Unit.checkAssert "freeIn begin empty"
-    (fn () => not (freeIn empty "x"))
-(* While Tests *)
-val () = 
-    Unit.checkAssert "freeIn while none"
-    (fn () => not (freeIn noVal "x"))
-val () =
-    Unit.checkAssert "freeIn while in guard"
-    (fn () => freeIn guard "x")
-val () =
-    Unit.checkAssert "freeIn while in clause"
-    (fn () => freeIn clause "x")
-val () =
-    Unit.checkAssert "freeIn while not in clause"
-    (fn () => not (freeIn clause "z"))
-val () =
-    Unit.checkAssert "freeIn while nested"
-    (fn () => freeIn guard "z")
-(* Let Tests *)
-val () = 
-    Unit.checkAssert "freeIn let in bs"
-    (fn () => freeIn letInBody "x")
-val () = 
-    Unit.checkAssert "freeIn let not in bs"
-    (fn () => not (freeIn letInBody "y"))
-val () = 
-    Unit.checkAssert "freeIn let empty bs"
-    (fn () => freeIn letEmptyBs "x") 
-val () =
-    Unit.checkAssert "freeIn let in body"
-    (fn () => freeIn letInBody "z")
-val () =
-    Unit.checkAssert "freeIn let in body with member of bs"
-    (fn () => freeIn letInBody "x")
-val () = 
-    Unit.checkAssert "freeIn letrec in bs"
-    (fn () => freeIn letrecInBody "x")
-val () = 
-    Unit.checkAssert "freeIn letrec not in bs"
-    (fn () => not (freeIn letrecInBody "y"))
-val () = 
-    Unit.checkAssert "freeIn letrec empty bs"
-    (fn () => freeIn letrecEmptyBs "x") 
-val () =
-    Unit.checkAssert "freeIn letrec in body"
-    (fn () => freeIn letrecInBody "z")
-val () =
-    Unit.checkAssert "freeIn letrec in body"
-    (fn () => not (freeIn letrecInBody "x"))
- end
+        local
+            val set_x1 = SET ("x", LITERAL (NUM 1))
+            (* More local definitions can go here for unit testing... *)
+                (* Literal Tests *)
+            val nilLiteral  = LITERAL NIL
+            val numLiteral  = LITERAL (NUM 99) 
+            val boolLiteral = LITERAL (BOOLV true)
+            val symLiteral  = LITERAL (SYM "X")
+            val pairLiteral = LITERAL (PAIR (BOOLV false, NUM 0))
+                (* Var tests *)
+            val varX = VAR "x"
+                (* Set tests *)
+            val setX       = SET ("x", nilLiteral) 
+            val setYinX    = SET ("x", SET ("y", numLiteral))
+            val setXinX    = SET ("x", SET ("x", boolLiteral))
+            val setZinYinX = SET ("x", SET ("y", SET ("z", pairLiteral)))
+                (* Lambda Test *)
+            val partB = LAMBDA (["y"], APPLY (VAR "equal?"
+                                              , [VAR "x", VAR "y"]))
+            val partA = LAMBDA (["x"], partB)
+                (* If Tests *)
+            val noVars = IFX (nilLiteral, numLiteral, boolLiteral)
+            val onePath = IFX (boolLiteral, numLiteral, varX) 
+            val inE1 = IFX (varX, numLiteral, pairLiteral) 
+            val inE2 = IFX (setX, setYinX, setXinX)
+            val inE3 = IFX (setX, partB, setZinYinX)
+                (* Begin Tests *)
+            val xyz = BEGIN [varX, setYinX, setZinYinX]
+            val nested = BEGIN [partA, partB]
+            val empty = BEGIN []
+                (* While Tests *)
+            val noVal = WHILEX (boolLiteral, nilLiteral) 
+            val guard = WHILEX (nested, setZinYinX)
+            val clause = WHILEX (empty, varX)
+                (* Let Tests *)
+            val letInBs = LETX (LET, [("x", varX), ("y", xyz)], nilLiteral)
+            val letEmptyBs = LETX (LET, [], varX)
+            val letInBody = LETX (LET, [("x", varX), ("y", setYinX)], xyz)
+            val letrecInBs = LETX (LETREC, [("x", varX), ("y", xyz)]
+                                   , nilLiteral)
+            val letrecEmptyBs = LETX (LETREC, [], varX)
+            val letrecInBody = LETX (LETREC, [("x", varX), ("y", setYinX)]
+                                     , xyz)
+            val letstarInBs = LETX (LETSTAR, [("x", varX), ("y", xyz)]
+                                    , nilLiteral)
+            val letstarEmptyBs = LETX (LETSTAR, [], varX)
+            val letstarInBody = LETX (LETSTAR, [("x", varX), ("y", setYinX)]
+                                      , xyz)
+        in
+            val () =
+                Unit.checkAssert "freeIn (set literal) true"
+                (fn () => freeIn set_x1 "x")
+            (* More unit tests go here ... *)
+            (* Literal tests *)
+            val () =
+                Unit.checkAssert "freeIn Literal Nil"
+                (fn () => not (freeIn nilLiteral "X"))
+            val () =
+                Unit.checkAssert "freeIn Literal Num"
+                (fn () => not (freeIn numLiteral "X"))
+            val () =
+                Unit.checkAssert "freeIn Literal Bool"
+                (fn () => not (freeIn boolLiteral "X"))
+            val () =
+                Unit.checkAssert "freeIn Literal Sym"
+                (fn () => not (freeIn symLiteral "X"))
+            val () =
+                Unit.checkAssert "freeIn Literal Pair"
+                (fn () => not (freeIn pairLiteral "X"))
+            (* Var tests *)
+            val () = 
+                Unit.checkAssert "freeIn free var"
+                (fn () => freeIn varX "x") 
+            val () = 
+                Unit.checkAssert "freeIn not free var" 
+                (fn () => not (freeIn varX "y"))
+            (* Set tests *)
+            val () = 
+                Unit.checkAssert "freeIn set x" 
+                (fn () => freeIn setX "x")
+            val () =
+                Unit.checkAssert "freeIn not set y" 
+                (fn () => not (freeIn setX "y"))
+            val () = 
+                Unit.checkAssert "freeIn set in first nested expression"
+                (fn () => freeIn setYinX "x")
+            val () =
+                Unit.checkAssert "freeIn set in nested expression"
+                (fn () => freeIn setYinX "y") 
+            val () =
+                Unit.checkAssert "freeIn not set in nested expression" 
+                (fn () => not (freeIn setYinX "z"))
+            val () = 
+                Unit.checkAssert "freeIn set in double nested expression" 
+                (fn () => freeIn setZinYinX "z")
+            (* Lambda Tests *)
+            val () = 
+                Unit.checkAssert "freeIn part A unfree variable x"
+                (fn () => not (freeIn partA "x"))
+            val () = 
+                Unit.checkAssert "freeIn part A unfree variable y"
+                (fn () => not (freeIn partA "y"))
+            val () = 
+                Unit.checkAssert "freeIn part A free variable equal?"
+                (fn () => freeIn partA "equal?")
+            val () = 
+                Unit.checkAssert "freeIn part B free variable x"
+                (fn () => freeIn partB "x")
+            val () =
+                Unit.checkAssert "freeIn part B unfree variable y"
+                (fn () => not (freeIn partB "y"))
+            val () =
+                Unit.checkAssert "freeIn part B free variable equal?"
+                (fn () => freeIn partB "equal?")
+            (* If Tests *) 
+            val () = 
+                Unit.checkAssert "freeIn if no vars" 
+                (fn () => not (freeIn noVars "x"))
+            val () =
+                Unit.checkAssert "freeIn if one path var" 
+                (fn () => freeIn onePath "x")
+            val () =
+                Unit.checkAssert "freeIn if one path no var" 
+                (fn () => not (freeIn onePath "y"))
+            val () =
+                Unit.checkAssert "freeIn if in e1"
+                (fn () => freeIn inE1 "x")
+            val () =
+                Unit.checkAssert "freeIn if in e1 not there"
+                (fn () => not (freeIn inE1 "y"))
+            val () =
+                Unit.checkAssert "freeIn if in e2"
+                (fn () => freeIn inE2 "y")
+            val () =
+                Unit.checkAssert "freeIn if in e3"
+                (fn () => freeIn inE3 "z")
+            (* Begin Tests *)
+            val () = 
+                Unit.checkAssert "freeIn begin x"
+                (fn () => freeIn xyz "x")
+            val () = 
+                Unit.checkAssert "freeIn begin y"
+                (fn () => freeIn xyz "y")
+            val () = 
+                Unit.checkAssert "freeIn begin z"
+                (fn () => freeIn xyz "z")
+            val () = 
+                Unit.checkAssert "freeIn begin not w"
+                (fn () => not (freeIn xyz "w"))
+            val () = 
+                Unit.checkAssert "freeIn begin lambda x"
+                (fn () => freeIn nested "x")
+            val () = 
+                Unit.checkAssert "freeIn begin lambda y"
+                (fn () => not (freeIn nested "y"))
+            val () = 
+                Unit.checkAssert "freeIn begin empty"
+                (fn () => not (freeIn empty "x"))
+            (* While Tests *)
+            val () = 
+                Unit.checkAssert "freeIn while none"
+                (fn () => not (freeIn noVal "x"))
+            val () =
+                Unit.checkAssert "freeIn while in guard"
+                (fn () => freeIn guard "x")
+            val () =
+                Unit.checkAssert "freeIn while in clause"
+                (fn () => freeIn clause "x")
+            val () =
+                Unit.checkAssert "freeIn while not in clause"
+                (fn () => not (freeIn clause "z"))
+            val () =
+                Unit.checkAssert "freeIn while nested"
+                (fn () => freeIn guard "z")
+            (* Let Tests *)
+            val () = 
+                Unit.checkAssert "freeIn let in bs"
+                (fn () => freeIn letInBody "x")
+            val () = 
+                Unit.checkAssert "freeIn let not in bs"
+                (fn () => not (freeIn letInBs "w"))
+            val () = 
+                Unit.checkAssert "freeIn let empty bs"
+                (fn () => freeIn letEmptyBs "x") 
+            val () =
+                Unit.checkAssert "freeIn let in body"
+                (fn () => freeIn letInBody "z")
+            val () =
+                Unit.checkAssert "freeIn let in body with member of bs"
+                (fn () => freeIn letInBody "x")
+            val () = 
+                Unit.checkAssert "freeIn letrec in bs"
+                (fn () => freeIn letrecInBody "z")
+            val () = 
+                Unit.checkAssert "freeIn letrec not in bs"
+                (fn () => not (freeIn letrecInBody "w"))
+            val () = 
+                Unit.checkAssert "freeIn letrec empty bs"
+                (fn () => not (freeIn letrecEmptyBs "y"))
+            val () =
+                Unit.checkAssert "freeIn letrec in body"
+                (fn () => freeIn letrecInBody "z")
+            val () =
+                Unit.checkAssert "freeIn letrec in body"
+                (fn () => not (freeIn letrecInBody "x"))
+            val () = 
+                Unit.checkAssert "freeIn letstar in bs"
+                (fn () => freeIn letstarInBody "z")
+            val () = 
+                Unit.checkAssert "freeIn letstar not in bs"
+                (fn () => not (freeIn letstarInBody "w"))
+            val () = 
+                Unit.checkAssert "freeIn letstar empty bs"
+                (fn () => not (freeIn letstarEmptyBs "y"))
+            val () =
+                Unit.checkAssert "freeIn letstar in body"
+                (fn () => freeIn letstarInBody "z")
+            val () =
+                Unit.checkAssert "freeIn letstar not in body"
+                (fn () => not (freeIn letstarInBody "w"))
+        end 
+
+(*****************************************************************
+    (improve ((param, expr), rho)) Given a list of parameters param, expression
+    expr, and a variable enviornment rho, which represents a lambda and an 
+    enviornment, and returns the lambda and it's closure, only keeping what
+    the lambda needs (it's free variables)
+        (name list * exp) * 'a env -> (name list * exp) * 'a env
+
+*****************************************************************)
+fun improve (f, rho) = (f, List.filter ((freeIn (LAMBDA f)) o fst) rho)
 
 (* evaluation, testing, and the read-eval-print loop for \uscheme S380b *)
 (* definitions of [[eval]], [[evaldef]], [[basis]], and [[processDef]] for \uscheme ((elided)) (THIS CAN'T HAPPEN -- claimed code was not used) *)
@@ -1820,7 +1848,7 @@ fun eval (e, rho) =
             in  b (es, BOOLV false)
             end
         (* more alternatives for [[ev]] for \uscheme 310a *)
-        | ev (LAMBDA (xs, e)) = CLOSURE ((xs, e), rho)
+        | ev (LAMBDA (xs, e)) = CLOSURE (improve ((xs, e), rho))
         (* more alternatives for [[ev]] for \uscheme 310b *)
         | ev (e as APPLY (f, args)) = 
                (case ev f

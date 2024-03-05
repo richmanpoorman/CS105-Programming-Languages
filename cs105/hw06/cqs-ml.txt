@@ -165,8 +165,7 @@ reference for the problem.
 
      (a) Free variables of `(lambda (x) (lambda (y) (equal? x y)))`
 
-         → Inside of the inner lambda y, the free variable is x 
-           but for the whole equation, there is equal? being free
+         → equal?
 
      (b) Free variables of `(lambda (y) (equal? x y))`
 
