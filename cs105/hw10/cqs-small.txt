@@ -123,13 +123,8 @@ example.
           - A class object
           - An instance of a class
         
-        > class protocols are class-methods, while instance protocols are 
-          methods; the difference is that a class protocol has the message 
-          go to the class itself, while the instance protocol sends the message
-          to the individual instance, which isn't the class object. 
-          A class object is the receiver of the class protocol message, 
-          whereas the instance of a class is the receiver for an instance 
-          protocol.
+        > A class protocol has the class object receive the message, and an 
+          instance protocol has the instance of a class receive the message.
 
 
     _You now know what you can do with each kind of message described
@@ -305,14 +300,6 @@ design.
 
         > 
         (method * (anInteger) (anInteger timesPos: self))
-        (method timesPos: (plus-n) ; self is :+ m
-            (LargePositiveInteger
-                withMagnitude:
-                (magnitude * (plus-n magnitude))))
-        (method timesNeg: (neg-n) ; self is :+ m
-            (LargeNegativeInteger
-                withMagnitude:
-                    (magnitude * (neg-n magnitude))))
 
     _You are ready to implement arithmetic on large integers (exercise 2)._
 
