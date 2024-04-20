@@ -13,13 +13,16 @@
       ((anInteger = 0) ifTrue:ifFalse: 
          {((NatZero new) validated)}
          {((
-            (NatNonzero new) first:rest: 
+            self first:rest: 
               (anInteger mod: (Natural base))
               (Natural fromSmall: (anInteger div: (Natural base)))
-            ) validated)}))
+            ) validated)
+          }
+      )
+    )
 
    
-   (class-method base () 10) ; private ;; TODO: CHANGE THE BASE
+   (class-method base () 2) ; private ;; TODO: CHANGE THE BASE
 
    ; private methods suggested from textbook (page 672)
    (method modBase () (self subclassResponsibility)) 
@@ -44,7 +47,24 @@
 
    (method sdivmod:with: (n aBlock) (self subclassResponsibility))
 
-   (method decimal () (self leftAsExercise))
+   (method decimal () 
+      [locals list x]
+      (set list (List new))
+      (set x self)
+      ((x isZero) whileFalse:
+        (x sdivmod:with: 
+          10
+          [block (q r)
+            (list addFirst: r) 
+            (set x q)
+          ]
+        )
+      )
+      ((list isEmpty) ifTrue: 
+        (list addFirst: 0)
+      )
+      list 
+   )
    (method isZero  () (self subclassResponsibility))
 
    ; methods that are already implemented for you
@@ -65,6 +85,13 @@
     self)
    (method compare-symbol: (aNat)
     (self compare:withLt:withEq:withGt: aNat {'LT} {'EQ} {'GT}))
+
+    (class-method first:rest: (anInteger aNatural) 
+      ( ((aNatural isZero) and: {(anInteger = 0)}) ifTrue:ifFalse:
+        {(aNatural validated)}
+        {(((NatNonzero new) first:rest: anInteger aNatural) validated)}
+      )
+    )
 )
 
 ; Represents a 0 natural number
@@ -156,7 +183,21 @@
   (method divBase () m) ;; TODO: SET VALUE TO m
   (method modBase () d)
   (method timesBase () 
-    ((NatNonzero new) first:rest: 0 self))
+    (NatNonzero first:rest: 0 self))
+  (method sdivmod:with: (v k) 
+    (m sdivmod:with: 
+      v 
+      [block (q r) 
+        (k value:value: 
+          (NatNonzero first:rest: 
+            (((r * (Natural base)) + d) div: v)
+            q
+          )
+          (((r * (Natural base)) + d) mod: v)
+        )
+      ]
+    )
+  )
 )
 
 ; For testing naturals

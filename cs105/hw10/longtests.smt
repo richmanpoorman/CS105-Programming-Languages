@@ -5,7 +5,7 @@
 (
     check-print
     (DebugNat of: (Natural fromSmall: 5))
-    0,5
+    0,1,0,1
 )
 (
     check-print
@@ -24,13 +24,8 @@
 )
 (
     check-print
-    (DebugNat of: (Natural fromSmall: 999))
-    0,9,9,9
-)
-(
-    check-print
     (DebugNat of: (Natural fromSmall: 2147483647))
-    0,2,1,4,7,4,8,3,6,4,7
+    0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 )
 
 ;; Arithmetic tests
@@ -138,8 +133,70 @@
 
 ;; + Tests
 (
-    check-assert 
-    ((Natural fromSmall: 0) plus:carry: (Natural fromSmall: 0) 1)
+    check-print
+    (DebugNat of: ((Natural fromSmall: 1) + (Natural fromSmall: 1)))
+    0,1,0
 )
-(n plus:carry: (Natural fromSmall: 0) 1)
-(n plus:carry: (Natural fromSmall: 1) 0)
+(
+    check-print
+    (DebugNat of: ((Natural fromSmall: 0) + (Natural fromSmall: 0)))
+    0
+)
+(
+    check-print
+    (DebugNat of: ((Natural fromSmall: 0) + (Natural fromSmall: (Natural base))))
+    0,1,0
+)
+(
+    check-print
+    (DebugNat of: ((Natural fromSmall: (Natural base)) + (Natural fromSmall: 0)))
+    0,1,0
+)
+(
+    check-print
+    (DebugNat of: 
+        ((Natural fromSmall: 2147483647) + (Natural fromSmall: 2147483647)))
+    0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0
+)
+(
+    check-print
+    (DebugNat of: ((Natural fromSmall: 104) + (Natural fromSmall: 12)))
+    0,1,1,1,0,1,0,0
+)
+(
+    check-print
+    (DebugNat of: ((Natural fromSmall: (Natural base)) + (Natural fromSmall: 0)))
+    0,1,0
+)
+
+;; sdivmod tests
+(
+    check-print
+    (DebugNat of: ((Natural fromSmall: 0) sdiv: 5))
+    0
+)
+(
+    check-print
+    (DebugNat of: ((Natural fromSmall: (Natural base)) sdiv: 1))
+    0,1,0
+)
+(
+    check-print
+    (DebugNat of: ((Natural fromSmall: (Natural base)) sdiv: (Natural base)))
+    0,1
+)
+(
+    check-expect
+    ((Natural fromSmall: (Natural base)) smod: 1)
+    0
+)
+(
+    check-expect
+    ((Natural fromSmall: ((Natural base) + 1)) smod: (Natural base))
+    1
+)
+(
+    check-expect
+    ((Natural fromSmall: ((Natural base) * 100)) smod: (Natural base))
+    0
+)
