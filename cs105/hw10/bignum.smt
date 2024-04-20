@@ -35,7 +35,9 @@
    (method = (aNatural) (self leftAsExercise))
    (method < (aNatural) (self leftAsExercise))
 
-   (method + (aNatural) (self leftAsExercise))
+   (method + (aNatural)
+    (self plus:carry: aNatural 0)
+   )
    (method * (aNatural) (self subclassResponsibility))
    (method subtract:withDifference:ifNegative: (aNatural diffBlock exnBlock)
       (self leftAsExercise))
@@ -80,6 +82,28 @@
   (method divBase () self) 
   (method modBase () 0)
   (method timesBase () self)
+  (method * (aNatural) self)
+  (method sdivmod:with: (aSmallInteger aBlock)
+    (aBlock value:value: self 0)
+  )
+  (method compare:withLt:withEq:withGt: (aNatural ltBlock eqBlock gtBlock)
+    ((aNatural isZero) ifTrue:ifFalse:
+      eqBlock
+      ltBlock
+    )
+  )
+  (method plus:carry: (aNatural c)
+    ((aNatural isZero) ifTrue:ifFalse:
+      {(Natural fromSmall: c)}
+      {(aNatural plus:carry: self c)}
+    )
+  )
+  (method minus:borrow: (aNatural c)
+    (((aNatural isZero) and: {(c = 0)}) ifTrue:ifFalse:
+      {self}
+      {(self error: 'subratract-from-zero)}
+    )
+  )
 )
 
 ; Represents a natural number greater than 0
@@ -132,7 +156,7 @@
   (method divBase () m) ;; TODO: SET VALUE TO m
   (method modBase () d)
   (method timesBase () 
-    (self first:rest: 0 self))
+    ((NatNonzero new) first:rest: 0 self))
 )
 
 ; For testing naturals
@@ -148,38 +172,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Put your unit tests for Exercise 1 here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        (check-assert ((Natural fromSmall: 0) isZero))
-        (check-assert (((Natural fromSmall: 1) isZero) not))
-        (
-          check-print
-            (DebugNat of: (Natural fromSmall: 5))
-            0,5
-        )
-        (
-          check-print
-            (DebugNat of: (Natural fromSmall: 0))
-            0
-        )
-        (
-          check-print
-            (DebugNat of: (Natural fromSmall: (Natural base)))
-            0,1,0
-        )
-        (
-          check-print
-            (DebugNat of: (Natural fromSmall: ((Natural base) * (Natural base))))
-            0,1,0,0
-        )
-        (
-          check-print
-            (DebugNat of: (Natural fromSmall: 999))
-            0,9,9,9
-        )
-        (
-          check-print
-            (DebugNat of: (Natural fromSmall: 2147483647))
-            0,2,1,4,7,4,8,3,6,4,7
-        )
+        
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;

@@ -1,11 +1,12 @@
 
 
-PACKAGES = (use bignum.smt)
+PACKAGE   = bignum.smt
+TEST_FILE = longtests.smt
 
 all: small-talk
 
 small-talk:
-	(echo "$(PACKAGES)"; cat) | ledit usmalltalk
+	(echo "(use $(PACKAGE))"; cat) | ledit usmalltalk
 
 test: 
-	(echo '(use bignum.smt) (use longtests.smt)'; cat)| usmalltalk -qq
+	(echo '(use $(PACKAGE)) (use $(TEST_FILE))'; cat) | ledit usmalltalk
