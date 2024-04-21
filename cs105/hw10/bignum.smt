@@ -51,17 +51,17 @@
       [locals list x]
       (set list (List new))
       (set x self)
-      ((x isZero) whileFalse:
-        (x sdivmod:with: 
-          10
-          [block (q r)
-            (list addFirst: r) 
-            (set x q)
-          ]
-        )
+      ({(x isZero)} whileFalse: 
+          {(x sdivmod:with: 
+            10
+            [block (q r)
+              (list addFirst: r) 
+              (set x q)
+            ]
+          )}
       )
       ((list isEmpty) ifTrue: 
-        (list addFirst: 0)
+        {(list addFirst: 0)}
       )
       list 
    )
