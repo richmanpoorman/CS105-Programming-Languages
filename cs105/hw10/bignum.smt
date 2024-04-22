@@ -22,7 +22,7 @@
     )
 
    
-   (class-method base () 2048) ; private ;; TODO: CHANGE THE BASE
+   (class-method base () 2048) ; private 
 
    ; private methods suggested from textbook (page 672)
    (method modBase () (self subclassResponsibility)) 
@@ -291,10 +291,7 @@
   (method print ()
     ( (self isZero) ifTrue:ifFalse:
       {(0 print)}
-      {
-        ('+ print)
-        ((self magnitude) print)
-      }
+      {((self magnitude) print)}
     )
   )
 
@@ -302,15 +299,33 @@
   (method isStrictlyPositive () ((self isZero) not))
   (method isNonnegative() ((self isZero) or: {(self isStrictlyPositive)}))
   (method negated () (LargeNegativeInteger withMagnitude: (self magnitude)))
+
   (method * (aNatural) (aNatural multiplyByLargePositiveInteger: self))
   (method multiplyByLargePositiveInteger: (aNatural)
     (LargePositiveInteger withMagnitude: 
-      ((aNatural magnitude) * (self magnitude))
+      ((self magnitude) * (aNatural magnitude))
     )
   )
   (method multiplyByLargeNegativeInteger: (aNatural)
     (LargeNegativeInteger withMagnitude: 
-      ((aNatural magnitude) * (self magnitude))
+      ((self magnitude) * (aNatural magnitude))
+    )
+  )
+  
+  (method + (aNatural) (aNatural addLargePositiveTo: self))
+  (method addLargePositiveTo: (aNatural)
+    (LargePositiveInteger withMagnitude: 
+      ((self magnitude) + (aNatural magnitude))
+    )
+  )
+  (method addLargeNegativeTo: (aNatural) 
+    (((self magnitude) < (aNatural magnitude)) ifTrue:ifFalse:
+      {(LargeNegativeInteger withMagnitude: 
+        ((aNatural magnitude) - (self magnitude))
+      )}
+      {(LargePositiveInteger withMagnitude: 
+        ((self magnitude) - (aNatural magnitude))
+      )}
     )
   )
 
@@ -329,23 +344,6 @@
 (class LargeNegativeInteger
   [subclass-of LargeInteger]
 
-
-  (method isNegative () ((self isZero) not))
-  (method isStrictlyPositive () false)
-  (method isNonnegative() (self isZero))
-  (method negated () (LargePositiveInteger withMagnitude: (self magnitude)))
-  (method * (aNatural) (aNatural multiplyByLargeNegativeInteger: self))
-  (method multiplyByLargePositiveInteger: (aNatural)
-    (LargeNegativeInteger withMagnitude: 
-      ((aNatural magnitude) * (self magnitude))
-    )
-  )
-  (method multiplyByLargeNegativeInteger: (aNatural)
-    (LargePositiveInteger withMagnitude: 
-      ((aNatural magnitude) * (self magnitude))
-    )
-  )
-
   (method print ()
     ( (self isZero) ifTrue:ifFalse:
       {(0 print)}
@@ -355,6 +353,39 @@
       }
     )
   )
+
+  (method isNegative () ((self isZero) not))
+  (method isStrictlyPositive () false)
+  (method isNonnegative() (self isZero))
+  (method negated () (LargePositiveInteger withMagnitude: (self magnitude)))
+  (method * (aNatural) (aNatural multiplyByLargeNegativeInteger: self))
+  (method multiplyByLargePositiveInteger: (aNatural)
+    (LargeNegativeInteger withMagnitude: 
+      ((self magnitude) * (aNatural magnitude))
+    )
+  )
+  (method multiplyByLargeNegativeInteger: (aNatural)
+    (LargePositiveInteger withMagnitude: 
+      ((self magnitude) * (aNatural magnitude))
+    )
+  )
+  (method + (aNatural) (aNatural addLargeNegativeTo: self))
+  (method addLargePositiveTo: (aNatural)
+    (((self magnitude) <= (aNatural magnitude)) ifTrue:ifFalse:
+      {(LargePositiveInteger withMagnitude: 
+        ((aNatural magnitude) - (self magnitude))
+      )}
+      {(LargeNegativeInteger withMagnitude: 
+        ((self magnitude) - (aNatural magnitude))
+      )}
+    )
+  )
+  (method addLargeNegativeTo: (aNatural) 
+    (LargeNegativeInteger withMagnitude: 
+      ((self magnitude) + (aNatural magnitude))
+    )
+  )
+  
 
   ;; short division (already implemented for you)
   (method sdiv: (anInteger)

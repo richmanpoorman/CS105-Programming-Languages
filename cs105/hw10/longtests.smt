@@ -144,12 +144,14 @@
 ;; )
 ;; (
 ;;     check-print
-;;     (DebugNat of: ((Natural fromSmall: 0) + (Natural fromSmall: (Natural base))))
+;;     (DebugNat of: 
+;;          ((Natural fromSmall: 0) + (Natural fromSmall: (Natural base))))
 ;;     0,1,0
 ;; )
 ;; (
 ;;     check-print
-;;     (DebugNat of: ((Natural fromSmall: (Natural base)) + (Natural fromSmall: 0)))
+;;     (DebugNat of: 
+;;          ((Natural fromSmall: (Natural base)) + (Natural fromSmall: 0)))
 ;;     0,1,0
 ;; )
 ;; (
@@ -165,7 +167,8 @@
 ;; )
 ;; (
 ;;     check-print
-;;     (DebugNat of: ((Natural fromSmall: (Natural base)) + (Natural fromSmall: 0)))
+;;     (DebugNat of: ((Natural fromSmall: 
+;;          (Natural base)) + (Natural fromSmall: 0)))
 ;;     0,1,0
 ;; )
 (
@@ -475,12 +478,16 @@
 )
 (
     check-print 
-    ((Natural fromSmall: ((Natural base) * (Natural base))) compare-symbol: (Natural fromSmall: 0))
+    ((Natural fromSmall: ((Natural base) * (Natural base))) compare-symbol: 
+        (Natural fromSmall: 0)
+    )
     GT
 )
 (
     check-print 
-    ((Natural fromSmall: ((Natural base) * (Natural base))) compare-symbol: (Natural fromSmall: 1))
+    ((Natural fromSmall: ((Natural base) * (Natural base))) compare-symbol: 
+        (Natural fromSmall: 1)
+    )
     GT
 )
 (
@@ -495,15 +502,21 @@
 )
 (
     check-assert
-    ((Natural fromSmall: ((Natural base) * (Natural base))) = (Natural fromSmall: ((Natural base) * (Natural base))))
+    ((Natural fromSmall: ((Natural base) * (Natural base))) = 
+        (Natural fromSmall: ((Natural base) * (Natural base)))
+    )
 )
 (
     check-assert
-    ((Natural fromSmall: 0) < (Natural fromSmall: ((Natural base) * (Natural base))))
+    ((Natural fromSmall: 0) < 
+        (Natural fromSmall: ((Natural base) * (Natural base)))
+    )
 )
 (
     check-assert
-    ((Natural fromSmall: 1) < (Natural fromSmall: ((Natural base) * (Natural base))))
+    ((Natural fromSmall: 1) < 
+        (Natural fromSmall: ((Natural base) * (Natural base)))
+    )
 )
 (
     check-assert
@@ -511,11 +524,15 @@
 )
 (
     check-assert
-    ((Natural fromSmall: ((Natural base) * (Natural base))) > (Natural fromSmall: 0))
+    ((Natural fromSmall: ((Natural base) * (Natural base))) > 
+        (Natural fromSmall: 0)
+    )
 )
 (
     check-assert
-    ((Natural fromSmall: ((Natural base) * (Natural base))) > (Natural fromSmall: 1))
+    ((Natural fromSmall: ((Natural base) * (Natural base))) > 
+        (Natural fromSmall: 1)
+    )
 )
 (
     check-assert
@@ -530,12 +547,16 @@
 )
 (
     check-print
-    ((Natural fromSmall: ((Natural base) * (Natural base))) - (Natural fromSmall: 0))
+    ((Natural fromSmall: ((Natural base) * (Natural base))) - 
+        (Natural fromSmall: 0)
+    )
     4194304
 )
 (
     check-error
-    ((Natural fromSmall: 0) - (Natural fromSmall: ((Natural base) * (Natural base))))
+    ((Natural fromSmall: 0) - 
+        (Natural fromSmall: ((Natural base) * (Natural base)))
+    )
 )
 (
     check-print 
@@ -549,7 +570,9 @@
 )
 (
     check-error 
-    ((Natural fromSmall: 15) - (Natural fromSmall: ((Natural base) * (Natural base))))
+    ((Natural fromSmall: 15) - 
+        (Natural fromSmall: ((Natural base) * (Natural base)))
+    )
 )
 (
     check-print
@@ -614,147 +637,276 @@
 ;; Test sign
 (
     check-assert 
-    (((LargePositiveInteger withMagnitude: 0) isNegative) not)
+    (((LargePositiveInteger withMagnitude: 
+        (Natural fromSmall: 0)) isNegative) not)
 )
 (
     check-assert 
-    (((LargePositiveInteger withMagnitude: 1) isNegative) not)
+    (((LargePositiveInteger withMagnitude: 
+        (Natural fromSmall: 1)) isNegative) not)
 )
 (
     check-assert 
-    (((LargeNegativeInteger withMagnitude: 0) isNegative) not)
+    (((LargeNegativeInteger withMagnitude: 
+        (Natural fromSmall: 0)) isNegative) not)
 )
 (
     check-assert 
-    ((LargeNegativeInteger withMagnitude: 1) isNegative) 
-)
-
-(
-    check-assert 
-    ((LargePositiveInteger withMagnitude: 0) isNonnegative)
-)
-(
-    check-assert 
-    ((LargePositiveInteger withMagnitude: 1) isNonnegative)
-)
-(
-    check-assert 
-    ((LargeNegativeInteger withMagnitude: 0) isNonnegative)
-)
-(
-    check-assert 
-    (((LargeNegativeInteger withMagnitude: 1) isNonnegative) not)
+    ((LargeNegativeInteger withMagnitude: (Natural fromSmall: 1)) isNegative) 
 )
 
 (
     check-assert 
-    (((LargePositiveInteger withMagnitude: 0) isStrictlyPositive) not)
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 0)) isNonnegative)
 )
 (
     check-assert 
-    ((LargePositiveInteger withMagnitude: 1) isStrictlyPositive)
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 1)) isNonnegative)
 )
 (
     check-assert 
-    (((LargeNegativeInteger withMagnitude: 0) isStrictlyPositive) not)
+    ((LargeNegativeInteger withMagnitude: (Natural fromSmall: 0)) isNonnegative)
 )
 (
     check-assert 
-    (((LargeNegativeInteger withMagnitude: 1) isStrictlyPositive) not)
+    (((LargeNegativeInteger withMagnitude: 
+        (Natural fromSmall: 1)) isNonnegative) not)
+)
+
+(
+    check-assert 
+    (((LargePositiveInteger withMagnitude: 
+        (Natural fromSmall: 0)) isStrictlyPositive) not)
+)
+(
+    check-assert 
+    ((LargePositiveInteger withMagnitude: 
+        (Natural fromSmall: 1)) isStrictlyPositive)
+)
+(
+    check-assert 
+    (((LargeNegativeInteger withMagnitude: 
+        (Natural fromSmall: 0)) isStrictlyPositive) not)
+)
+(
+    check-assert 
+    (((LargeNegativeInteger withMagnitude: 
+        (Natural fromSmall: 1)) isStrictlyPositive) not)
 )
 
 (
     check-print
-    (LargeNegativeInteger withMagnitude: 0)
+    (LargeNegativeInteger withMagnitude: (Natural fromSmall: 0))
     0
 )
 (
     check-print
-    (LargePositiveInteger withMagnitude: 0)
+    (LargePositiveInteger withMagnitude: (Natural fromSmall: 0))
     0
 )
 (
     check-print
-    (LargeNegativeInteger withMagnitude: 1)
+    (LargeNegativeInteger withMagnitude: (Natural fromSmall: 1))
     -1
 )
 (
     check-print
-    (LargePositiveInteger withMagnitude: 1)
-    +1
+    (LargePositiveInteger withMagnitude: (Natural fromSmall: 1))
+    1
 )
 
 ;; Negated
 (
     check-assert 
-    ((((LargePositiveInteger withMagnitude: 0) negated) isNegative) not)
+    ((((LargePositiveInteger withMagnitude: 
+        (Natural fromSmall: 0)) negated) isNegative) not)
 )
 (
     check-assert 
-    (((LargePositiveInteger withMagnitude: 1) negated) isNegative)
+    (((LargePositiveInteger withMagnitude: 
+        (Natural fromSmall: 1)) negated) isNegative)
 )
 (
     check-assert 
-    ((((LargeNegativeInteger withMagnitude: 0) negated) isNegative) not)
+    ((((LargeNegativeInteger withMagnitude: 
+        (Natural fromSmall: 0)) negated) isNegative) not)
 )
 (
     check-assert 
-    ((((LargeNegativeInteger withMagnitude: 1) negated) isNegative) not)
-)
-
-(
-    check-assert 
-    (((LargePositiveInteger withMagnitude: 0) negated) isNonnegative)
-)
-(
-    check-assert 
-    ((((LargePositiveInteger withMagnitude: 1) negated) isNonnegative) not)
-)
-(
-    check-assert 
-    (((LargeNegativeInteger withMagnitude: 0) negated) isNonnegative)
-)
-(
-    check-assert 
-    (((LargeNegativeInteger withMagnitude: 1) negated) isNonnegative)
+    ((((LargeNegativeInteger withMagnitude: 
+        (Natural fromSmall: 1)) negated) isNegative) not)
 )
 
 (
     check-assert 
-    ((((LargePositiveInteger withMagnitude: 0) negated) isStrictlyPositive) not)
+    (((LargePositiveInteger withMagnitude: 
+        (Natural fromSmall: 0)) negated) isNonnegative)
 )
 (
     check-assert 
-    ((((LargePositiveInteger withMagnitude: 1) negated) isStrictlyPositive) not)
+    ((((LargePositiveInteger withMagnitude: 
+        (Natural fromSmall: 1)) negated) isNonnegative) not)
 )
 (
     check-assert 
-    ((((LargeNegativeInteger withMagnitude: 0) negated) isStrictlyPositive) not)
+    (((LargeNegativeInteger withMagnitude: 
+        (Natural fromSmall: 0)) negated) isNonnegative)
 )
 (
     check-assert 
-    (((LargeNegativeInteger withMagnitude: 1) negated) isStrictlyPositive)
+    (((LargeNegativeInteger withMagnitude: 
+        (Natural fromSmall: 1)) negated) isNonnegative)
+)
+
+(
+    check-assert 
+    ((((LargePositiveInteger withMagnitude: 
+        (Natural fromSmall: 0)) negated) isStrictlyPositive) not)
+)
+(
+    check-assert 
+    ((((LargePositiveInteger withMagnitude: 
+        (Natural fromSmall: 1)) negated) isStrictlyPositive) not)
+)
+(
+    check-assert 
+    ((((LargeNegativeInteger withMagnitude: 
+        (Natural fromSmall: 0)) negated) isStrictlyPositive) not)
+)
+(
+    check-assert 
+    (((LargeNegativeInteger withMagnitude: 
+        (Natural fromSmall: 1)) negated) isStrictlyPositive)
 )
 
 (
     check-print
-    ((LargeNegativeInteger withMagnitude: 0) negated)
+    ((LargeNegativeInteger withMagnitude: (Natural fromSmall: 0)) negated)
     0
 )
 (
     check-print
-    ((LargePositiveInteger withMagnitude: 0) negated)
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 0)) negated)
     0
 )
 (
     check-print
-    ((LargeNegativeInteger withMagnitude: 1) negated)
-    +1
+    ((LargeNegativeInteger withMagnitude: (Natural fromSmall: 1)) negated)
+    1
 )
 (
     check-print
-    ((LargePositiveInteger withMagnitude: 1) negated)
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 1)) negated)
     -1
+)
+(
+    check-print
+    ((LargeInteger fromSmall: 0) negated)
+    0
 )
 
 ;; Multiplication Tests
+(
+    check-print
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 0)) * 
+        (LargePositiveInteger withMagnitude: (Natural fromSmall: 0)))
+    0
+)
+(
+    check-print
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 2147483647)) * 
+        (LargePositiveInteger withMagnitude: (Natural fromSmall: 2147483647)))
+    4611686014132420609
+)
+(
+    check-print
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 2147483647)) * 
+        (LargeNegativeInteger withMagnitude: (Natural fromSmall: 2147483647)))
+    -4611686014132420609
+)
+(
+    check-print
+    ((LargeNegativeInteger withMagnitude: (Natural fromSmall: 2147483647)) * 
+        (LargePositiveInteger withMagnitude: (Natural fromSmall: 2147483647)))
+    -4611686014132420609
+)
+(
+    check-print
+    ((LargeNegativeInteger withMagnitude: (Natural fromSmall: 2147483647)) * 
+        (LargeNegativeInteger withMagnitude: (Natural fromSmall: 2147483647)))
+    4611686014132420609
+)
+(
+    check-print
+    ((LargeNegativeInteger withMagnitude: (Natural fromSmall: 2147483647)) * 
+        (LargeNegativeInteger withMagnitude: (Natural fromSmall: 0)))
+    0
+)
+(
+    check-print
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 2147483647)) * 
+        (LargeNegativeInteger withMagnitude: (Natural fromSmall: 0)))
+    0
+)
+(
+    check-print
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 5)) * 
+        (LargeNegativeInteger withMagnitude: (Natural fromSmall: 1)))
+    -5
+)
+
+;; Addition tests
+(
+    check-print
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 10)) + 
+        (LargePositiveInteger withMagnitude: (Natural fromSmall: 10)))
+    20
+)
+(
+    check-print
+    ((LargeNegativeInteger withMagnitude: (Natural fromSmall: 10)) + 
+        (LargeNegativeInteger withMagnitude: (Natural fromSmall: 10)))
+    -20
+)
+(
+    check-print
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 10)) + 
+        (LargeNegativeInteger withMagnitude: (Natural fromSmall: 10)))
+    0
+)
+(
+    check-print
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 1)) + 
+        (LargeNegativeInteger withMagnitude: (Natural fromSmall: 10)))
+    -9
+)
+(
+    check-print
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 10)) + 
+        (LargeNegativeInteger withMagnitude: (Natural fromSmall: 1)))
+    9
+)
+(
+    check-print
+    ((LargeNegativeInteger withMagnitude: (Natural fromSmall: 1)) + 
+        (LargePositiveInteger withMagnitude: (Natural fromSmall: 10)))
+    9
+)
+(
+    check-print
+    ((LargeNegativeInteger withMagnitude: (Natural fromSmall: 10)) + 
+        (LargePositiveInteger withMagnitude: (Natural fromSmall: 1)))
+    -9
+)
+(
+    check-print
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 2147483647)) + 
+        (LargePositiveInteger withMagnitude: (Natural fromSmall: 2147483647)))
+    4294967294
+)
+(
+    check-print
+    ((LargeNegativeInteger withMagnitude: (Natural fromSmall: 2147483647)) + 
+        (LargeNegativeInteger withMagnitude: (Natural fromSmall: 2147483647)))
+    -4294967294
+)

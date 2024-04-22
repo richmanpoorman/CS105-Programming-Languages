@@ -25,3 +25,6 @@ mult-test:
 	) \
 	| usmalltalk -qq \
 	| grep multiplyByLarge
+
+bignum-test:
+	(echo '(use bignum.smt) (use bignum-tests.smt)') | usmalltalk -qq
