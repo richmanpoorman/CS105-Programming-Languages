@@ -22,7 +22,7 @@
     )
 
    
-   (class-method base () 2) ; private ;; TODO: CHANGE THE BASE
+   (class-method base () 2048) ; private ;; TODO: CHANGE THE BASE
 
    ; private methods suggested from textbook (page 672)
    (method modBase () (self subclassResponsibility)) 
@@ -35,15 +35,33 @@
 
    (method timesDigit:plus: (d r) (self subclassResponsibility)) ; private
 
-   (method = (aNatural) (self leftAsExercise))
-   (method < (aNatural) (self leftAsExercise))
+   (method = (aNatural) 
+    (self compare:withLt:withEq:withGt: 
+      aNatural
+      {false}
+      {true}
+      {false}
+    )
+   )
+   (method < (aNatural) 
+    (self compare:withLt:withEq:withGt: 
+      aNatural
+      {true}
+      {false}
+      {false}
+    )
+   )
 
    (method + (aNatural)
     (self plus:carry: aNatural 0)
    )
    (method * (aNatural) (self subclassResponsibility))
    (method subtract:withDifference:ifNegative: (aNatural diffBlock exnBlock)
-      (self leftAsExercise))
+      ( (self < aNatural) ifTrue:ifFalse:
+        {(exnBlock value)}
+        {(diffBlock value: (self minus:borrow: aNatural 0))}
+      ) 
+   )
 
    (method sdivmod:with: (n aBlock) (self subclassResponsibility))
 
@@ -198,6 +216,22 @@
       ]
     )
   )
+  
+  (method compare:withLt:withEq:withGt: (aNatural ltBlock eqBlock gtBlock)
+    (m compare:withLt:withEq:withGt: (aNatural divBase)
+      ltBlock 
+      {(
+        (d = (aNatural modBase)) ifTrue:ifFalse:
+          eqBlock
+          {(
+            (d < (aNatural modBase)) ifTrue:ifFalse:
+              ltBlock 
+              gtBlock
+          )}
+      )}
+      gtBlock
+    )
+  )
 )
 
 ; For testing naturals
@@ -254,6 +288,32 @@
 (class LargePositiveInteger
   [subclass-of LargeInteger]
 
+  (method print ()
+    ( (self isZero) ifTrue:ifFalse:
+      {(0 print)}
+      {
+        ('+ print)
+        ((self magnitude) print)
+      }
+    )
+  )
+
+  (method isNegative () false)
+  (method isStrictlyPositive () ((self isZero) not))
+  (method isNonnegative() ((self isZero) or: {(self isStrictlyPositive)}))
+  (method negated () (LargeNegativeInteger withMagnitude: (self magnitude)))
+  (method * (aNatural) (aNatural multiplyByLargePositiveInteger: self))
+  (method multiplyByLargePositiveInteger: (aNatural)
+    (LargePositiveInteger withMagnitude: 
+      ((aNatural magnitude) * (self magnitude))
+    )
+  )
+  (method multiplyByLargeNegativeInteger: (aNatural)
+    (LargeNegativeInteger withMagnitude: 
+      ((aNatural magnitude) * (self magnitude))
+    )
+  )
+
 
   ;; short division (already implemented for you)
   (method sdiv: (anInteger)
@@ -270,6 +330,31 @@
   [subclass-of LargeInteger]
 
 
+  (method isNegative () ((self isZero) not))
+  (method isStrictlyPositive () false)
+  (method isNonnegative() (self isZero))
+  (method negated () (LargePositiveInteger withMagnitude: (self magnitude)))
+  (method * (aNatural) (aNatural multiplyByLargeNegativeInteger: self))
+  (method multiplyByLargePositiveInteger: (aNatural)
+    (LargeNegativeInteger withMagnitude: 
+      ((aNatural magnitude) * (self magnitude))
+    )
+  )
+  (method multiplyByLargeNegativeInteger: (aNatural)
+    (LargePositiveInteger withMagnitude: 
+      ((aNatural magnitude) * (self magnitude))
+    )
+  )
+
+  (method print ()
+    ( (self isZero) ifTrue:ifFalse:
+      {(0 print)}
+      {
+        ('- print)
+        ((self magnitude) print)
+      }
+    )
+  )
 
   ;; short division (already implemented for you)
   (method sdiv: (anInteger)
@@ -279,3 +364,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Put your unit tests for Exercise 2 here
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(val four (LargePositiveInteger withMagnitude: 4))
+(val neg-four (LargeNegativeInteger withMagnitude: 4))
