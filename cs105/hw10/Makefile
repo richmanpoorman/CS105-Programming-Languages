@@ -3,7 +3,7 @@
 PACKAGE   = bignum.smt
 TEST_FILE = longtests.smt
 
-all: small-talk
+all: small-talk test large-test mult-test bignum-test
 
 small-talk:
 	(echo "(use $(PACKAGE))"; cat) | ledit usmalltalk

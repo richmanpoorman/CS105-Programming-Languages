@@ -198,7 +198,7 @@
     (set m aNatural)
     (set d anInteger)
     (self validated))
-  (method divBase () m) ;; TODO: SET VALUE TO m
+  (method divBase () m) 
   (method modBase () d)
   (method timesBase () 
     (NatNonzero first:rest: 0 self))

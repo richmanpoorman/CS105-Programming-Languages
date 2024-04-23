@@ -27,7 +27,10 @@
 ;;     (DebugNat of: (Natural fromSmall: 2147483647))
 ;;     0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 ;; )
-
+(
+    check-error
+    (Natural fromSmall: -1)
+)
 ;; Arithmetic tests
     ;; Type checks
 (
@@ -909,4 +912,22 @@
     ((LargeNegativeInteger withMagnitude: (Natural fromSmall: 2147483647)) + 
         (LargeNegativeInteger withMagnitude: (Natural fromSmall: 2147483647)))
     -4294967294
+)
+(
+    check-print
+    ((LargeNegativeInteger withMagnitude: (Natural fromSmall: 1)) + 
+        (LargeNegativeInteger withMagnitude: (Natural fromSmall: 2147483647)))
+    -2147483648
+)
+(
+    check-print
+    ((LargePositiveInteger withMagnitude: (Natural fromSmall: 1)) + 
+        (LargeNegativeInteger withMagnitude: (Natural fromSmall: 2147483647)))
+    -2147483646
+)
+
+;; EXTRA 
+(
+    check-assert 
+    ((Natural fromSmall: 0) isKindOf: Natural)
 )

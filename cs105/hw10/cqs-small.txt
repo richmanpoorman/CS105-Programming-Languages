@@ -298,8 +298,7 @@ design.
         `LargePositiveInteger` class. It will be very similar to the code
         chunk on page 667, and it should use either `timesPos:` or `timesNeg:`.
 
-        > 
-        (method * (anInteger) (anInteger timesPos: self))
+        > (method * (anInteger) (anInteger timesPos: self))
 
     _You are ready to implement arithmetic on large integers (exercise 2)._
 
